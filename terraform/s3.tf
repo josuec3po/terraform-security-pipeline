@@ -1,5 +1,5 @@
-//Codigo de crash intencional para teste da ferramenta tfsec
-//Cria um bucket S3 com ACL pública, o que é uma má prática de segurança
+// Código de crash intencional para teste da ferramenta tfsec
+// Cria um bucket S3 com ACL pública (má prática de segurança)
 /*
 resource "aws_s3_bucket" "insecure_bucket" {
   bucket = "tfsec-insecure-bucket-example-123456"
@@ -11,8 +11,8 @@ resource "aws_s3_bucket_acl" "insecure_bucket_acl" {
 }
 */
 
-//Codigo corrigido para seguir boas práticas de segurança
-//Cria um bucket S3 com bloqueio de acesso público
+// Código corrigido seguindo boas práticas de segurança
+
 resource "aws_s3_bucket" "secure_bucket" {
   bucket = "tfsec-secure-bucket-example-123456"
 }
@@ -34,13 +34,18 @@ resource "aws_s3_bucket_public_access_block" "secure_block" {
   restrict_public_buckets = true
 }
 
+resource "aws_kms_key" "s3_key" {
+  description             = "KMS key for S3 bucket encryption"
+  deletion_window_in_days = 10
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption" {
   bucket = aws_s3_bucket.secure_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3_key.arn
     }
   }
 }
-
