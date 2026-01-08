@@ -34,10 +34,13 @@ resource "aws_s3_bucket_public_access_block" "secure_block" {
   restrict_public_buckets = true
 }
 
+//KMS key com rototion habilitada
 resource "aws_kms_key" "s3_key" {
   description             = "KMS key for S3 bucket encryption"
   deletion_window_in_days = 10
+  enable_key_rotation     = true
 }
+
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption" {
   bucket = aws_s3_bucket.secure_bucket.id
@@ -48,4 +51,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption
       kms_master_key_id = aws_kms_key.s3_key.arn
     }
   }
+}
+
+//Bucket logging
+# Bucket para armazenar logs de acesso
+resource "aws_s3_bucket" "log_bucket" {
+  bucket = "tfsec-secure-bucket-logs-123456"
+}
+
+# Habilita logging no bucket principal
+resource "aws_s3_bucket_logging" "secure_bucket_logging" {
+  bucket        = aws_s3_bucket.secure_bucket.id
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "access-logs/"
 }
