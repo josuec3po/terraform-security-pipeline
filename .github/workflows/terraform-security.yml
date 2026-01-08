@@ -23,10 +23,6 @@ jobs:
         working-directory: terraform
         run: terraform init
 
-      - name: Select Terraform Workspace
-        working-directory: terraform
-        run: terraform workspace select $TF_WORKSPACE || terraform workspace new $TF_WORKSPACE
-
       - name: Terraform Format
         working-directory: terraform
         run: terraform fmt -check
