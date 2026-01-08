@@ -1,5 +1,8 @@
 name: Terraform Security Pipeline
 
+env:
+  TF_WORKSPACE: dev
+
 on:
   push:
     branches: [ "main" ]
@@ -20,6 +23,10 @@ jobs:
         working-directory: terraform
         run: terraform init
 
+      - name: Select Terraform Workspace
+        working-directory: terraform
+        run: terraform workspace select $TF_WORKSPACE || terraform workspace new $TF_WORKSPACE
+
       - name: Terraform Format
         working-directory: terraform
         run: terraform fmt -check
@@ -28,6 +35,8 @@ jobs:
         working-directory: terraform
         run: terraform validate
 
+        #Ferramenta open source
+        #Analisa código Terraform em busca de vulnerabilidades de segurança
       - name: Run tfsec
         uses: aquasecurity/tfsec-action@v1.0.3
 
