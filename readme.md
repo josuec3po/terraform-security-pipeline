@@ -52,8 +52,9 @@ terraform init
 terraform validate
 
 ```
-
+---
 ## Estrutura do Repositório
+```
 .
 ├── terraform/
 │   ├── main.tf
@@ -64,3 +65,4 @@ terraform validate
     └── workflows/
         └── terraform-security.yml
 
+```
